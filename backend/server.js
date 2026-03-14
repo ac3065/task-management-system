@@ -29,7 +29,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 connectDB();
 //Middlewares
 app.use(express.json());
-
+app.get("/", (req, res) => {
+  res.send("Task Management API is running");
+});
 //Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
