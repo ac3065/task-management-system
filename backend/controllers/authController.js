@@ -35,10 +35,10 @@ const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Build profileImageUrl if file is uploaded
-    const profileImageUrl = req.file
-      ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
-      : "";
-
+    // const profileImageUrl = req.file
+    //   ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
+    //   : "";
+const profileImageUrl = req.body.profileImageUrl || "";
     // Create user
     const user = await User.create({
       name,
