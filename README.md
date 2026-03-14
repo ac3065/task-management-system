@@ -1,4 +1,4 @@
-# full-stack-AssignHub 
+# full-stack-Task Management Application 
 ***
 
 ### AssignHub – Project Implementation Summary
