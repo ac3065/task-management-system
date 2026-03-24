@@ -36,6 +36,7 @@ AssignHub is a work-in-progress, role-based assignment management system designe
 
 ### 📈 Reports & Analytics
 ![Report](images/report.png)
+![Report](images/downloadReport.png)
 
 - There are two roles: Admin (Professor) and Student, both authenticated using JWT-based login.
 - Multiple admins (professors) can coexist; each can create and manage assignments.
