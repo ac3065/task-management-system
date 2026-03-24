@@ -7,7 +7,28 @@
 AssignHub is a work-in-progress, role-based assignment management system designed to meet the key requirements from the Joineazy technical task. The current implementation focuses on robust role-based access, assignment workflow, and progress analytics, with several core features fully built and others under development.
 
 ***
+## 📸 Project Preview
 
+### 🔐 Authentication (Login / Signup)
+![Login](images/login.png)
+
+### 📊 Dashboard Overview
+![Dashboard](images/dashboard.png)
+
+### 📝 Create Assignment (Admin)
+![Create Assignment](images/create-assignment.png)
+
+### 📋 Assignment List (Student View)
+![Assignments](images/assignments.png)
+
+### ✅ Submission Workflow
+![Submission](images/submission.png)
+
+### 📈 Analytics & Progress Tracking
+![Analytics](images/analytics.png)
+
+### 📤 Export Reports (Excel)
+![Export](images/export.png)
 #### Roles & Authentication
 
 - There are two roles: Admin (Professor) and Student, both authenticated using JWT-based login.
