@@ -10,7 +10,7 @@ AssignHub is a work-in-progress, role-based assignment management system designe
 ## 📸 Project Preview
 
 ### 🔐 Authentication (Login / Signup)
-![Login](images/login.png)
+https://github.com/ac3065/task-management-system/blob/main/images/Screenshot%202026-03-24%20200357.png
 
 ### 📊 Dashboard Overview
 ![Dashboard](images/dashboard.png)
