@@ -10,26 +10,32 @@ AssignHub is a work-in-progress, role-based assignment management system designe
 ## 📸 Project Preview
 
 ### 🔐 Authentication (Login / Signup)
-![SignUp](signup.png)
+![Login](images/login.png)
+![Signup](images/signup.png)
 
-### 📊 Dashboard Overview
-![Dashboard](images/dashboard.png)
+### 📊 User Dashboard
+![Dashboard](images/userDashboard.png)
 
 ### 📝 Create Assignment (Admin)
-![Create Assignment](images/create-assignment.png)
+![Create](images/create.png)
 
-### 📋 Assignment List (Student View)
-![Assignments](images/assignments.png)
+### 📋 Manage Assignments
+![Manage](images/manage.png)
 
-### ✅ Submission Workflow
-![Submission](images/submission.png)
+### 📌 Task Preview
+![Task Preview](images/TaskPreview.png)
 
-### 📈 Analytics & Progress Tracking
-![Analytics](images/analytics.png)
+### 📑 My Tasks (Student View)
+![My Tasks](images/myTasks.png)
 
-### 📤 Export Reports (Excel)
-![Export](images/export.png)
-#### Roles & Authentication
+### ✏️ Update Task
+![Update](images/update.png)
+
+### ❌ Delete Task
+![Delete](images/DeleteTask.png)
+
+### 📈 Reports & Analytics
+![Report](images/report.png)
 
 - There are two roles: Admin (Professor) and Student, both authenticated using JWT-based login.
 - Multiple admins (professors) can coexist; each can create and manage assignments.
