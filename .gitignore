@@ -9,7 +9,19 @@ build/
 
 # Ignore env and log files
 .env
+**/.env
+**/.env.local
 *.log
+!**/.env.example
+!**/.env.production.example
+
+# Keys / secrets
+*.pem
+serverpem.pem
+
+# Runtime uploads (keep folder if needed locally)
+backend/uploads/*
+!backend/uploads/.gitkeep
 
 # Ignore system files
 .DS_Store

@@ -42,13 +42,14 @@ const SignUp = () => {
       // Step 1: Log file object
       console.log("📷 Selected profilePic:", profilePic);
 
-      // Step 2: Upload image if present
+      // Step 2: Upload image first, then save URL on user document
       if (profilePic) {
-        console.log("⏫ Uploading image...");
         const imgUploadRes = await uploadImage(profilePic);
-        console.log("✅ Image upload response:", imgUploadRes);
         profileImageUrl = imgUploadRes?.imageUrl || "";
-        console.log("🌐 Final profileImageUrl to send:", profileImageUrl);
+        if (!profileImageUrl) {
+          setError("Profile photo upload failed. Please try again.");
+          return;
+        }
       }
 
       // Step 3: Register user
@@ -85,12 +86,14 @@ const SignUp = () => {
 
   return (
     <AuthLayout>
-      <div className="lg:w-[100%] h-auto md:h-full mt-10 md:mt-0 flex flex-col justify-center">
-        <h3 className="text-xl font-semibold text-black">Create an Account</h3>
-        <p className="">Join us today by entering your details below.</p>
+      <div className="w-full">
+        <h3 className="text-xl font-semibold text-slate-900">Create an Account</h3>
+        <p className="mt-1 mb-5 text-xs text-slate-600">
+          Join us today by entering your details below.
+        </p>
         <form onSubmit={handleSignUp}>
           <ProfilePhotoSelector image={profilePic} setImage={setProfilePic} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-4">
             <Input
               value={fullName}
               onChange={({ target }) => setFullName(target.value)}
@@ -122,15 +125,12 @@ const SignUp = () => {
               label="Admin Invite Token"
             />
           </div>
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
 
-          <button
-            type="submit"
-            className="btn-primary w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-          >
+          <button type="submit" className="btn-primary">
             SIGNUP
           </button>
-          <p className="text-[13px] text-slate-800 mt-3">
+          <p className="mt-3 text-[13px] text-slate-700">
             Already an account?{" "}
             <Link className="font-medium text-primary underline" to="/login">
               Login

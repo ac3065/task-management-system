@@ -4,6 +4,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import Modal from "../Modal"; // or similar
 import AvatarGroup from "../AvatarGroup";
+import { defaultProfileImage, resolveAvatarUrl } from "../../utils/avatar";
 
 const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
   const [allUsers, setAllUsers] = useState([]);
@@ -78,9 +79,12 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
               className="flex items-center gap-4 p-3 border-b border-gray-200"
             >
               <img
-                src={user.profileImageUrl}
+                src={resolveAvatarUrl(user.profileImageUrl)}
                 alt={user.name}
-                className="w-10 h-10 rounded-full"
+                className="w-10 h-10 rounded-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = defaultProfileImage;
+                }}
               />
               <div className="flex-1">
                 <p className="font-medium text-gray-800 dark:text-white">

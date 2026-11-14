@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { UserContext } from "../../context/userContext";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
@@ -25,25 +25,24 @@ const UserDashboard = () => {
   const [pieChartData, setPieChartData] = useState([]);
   const [barChartData, setBarChartData] = useState([]);
 
-  //Prepare Chart Data
   const prepareChartData = (data) => {
     const taskDistribution = data?.taskDistribution || null;
     const taskPriorityLevels = data?.taskPriorityLevels || null;
 
-    const taskDistributionData = [
+    setPieChartData([
       { status: "Pending", count: taskDistribution?.Pending || 0 },
       { status: "In Progress", count: taskDistribution?.InProgress || 0 },
       { status: "Completed", count: taskDistribution?.Completed || 0 },
-    ];
-    setPieChartData(taskDistributionData);
-    const PriorityLevelData = [
+    ]);
+
+    setBarChartData([
       { priority: "Low", count: taskPriorityLevels?.Low || 0 },
       { priority: "Medium", count: taskPriorityLevels?.Medium || 0 },
       { priority: "High", count: taskPriorityLevels?.High || 0 },
-    ];
-    setBarChartData(PriorityLevelData);
+    ]);
   };
-  const getDashboardData = async () => {
+
+  const getDashboardData = useCallback(async () => {
     try {
       const response = await axiosInstance.get(
         API_PATHS.TASKS.GET_USER_DASHBOARD_DATA
@@ -53,32 +52,40 @@ const UserDashboard = () => {
         prepareChartData(response.data?.charts || null);
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching user dashboard data:", error);
     }
-  };
+  }, []);
 
   const onSeeMore = () => {
-    navigate("/admin/tasks");
+    navigate("/user/tasks");
   };
 
   useEffect(() => {
     getDashboardData();
 
-    return () => {};
-  });
+    const onFocus = () => getDashboardData();
+    window.addEventListener("focus", onFocus);
+    const timer = setInterval(getDashboardData, 15000);
+
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      clearInterval(timer);
+    };
+  }, [getDashboardData]);
+
   return (
     <DashboardLayout activeMenu="Dashboard">
       <div className="card my-5">
         <div>
           <div className="col-span-3">
             <h2 className="text-xl md:text-2xl">Good Morning! {user?.name}</h2>
-            <p className="text-xs md:text-[13px] text-gray-400 mt-1.5">
+            <p className="mt-1.5 text-xs text-gray-400 md:text-[13px]">
               {moment().format("dddd Do MMM YYYY")}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mt-5">
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-4 md:gap-6">
           <InfoCard
             label="Total Tasks"
             value={addThousandsSeparator(
@@ -110,7 +117,7 @@ const UserDashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-4 md:my-6">
+      <div className="my-4 grid grid-cols-1 gap-6 md:my-6 md:grid-cols-2">
         <div>
           <div className="card">
             <div className="flex items-center justify-between">

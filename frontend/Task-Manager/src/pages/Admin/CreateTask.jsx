@@ -14,6 +14,7 @@ import AddAttachmentsInput from "../../components/Inputs/AddAttachmentsInput";
 import axios from "axios";
 import Modal from "../../components/Modal";
 import DeleteAlert from "../../components/DeleteAlert";
+import ActivityTrail from "../../components/Activity/ActivityTrail";
 const CreateTask = () => {
   const location = useLocation();
   const { taskId } = location.state || {};
@@ -296,6 +297,8 @@ const CreateTask = () => {
                 {taskId ? "UPDATE TASK" : "CREATE TASK"}
               </button>
             </div>
+
+            {taskId && <ActivityTrail taskId={taskId} />}
           </div>
         </div>
       </div>

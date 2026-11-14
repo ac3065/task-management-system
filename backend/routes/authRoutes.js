@@ -20,6 +20,7 @@ router.post("/upload-image", upload.single("image"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
   }
+  // Absolute URL so frontend <img src> works across localhost ports
   const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
     req.file.filename
   }`;

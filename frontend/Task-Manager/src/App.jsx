@@ -13,7 +13,8 @@ import ManageTasks from "./pages/Admin/ManageTasks";
 import CreateTask from "./pages/Admin/CreateTask";
 import ManageUsers from "./pages/Admin/ManageUsers";
 import UserDashboard from "./pages/User/UserDashboard";
-import ViewTaskDetails from "./pages/User/ViewTaskDetails"; // Fixed import
+import MyTasks from "./pages/User/MyTasks";
+import ViewTaskDetails from "./pages/User/ViewTaskDetails";
 import PrivateRoute from "./routes/PrivateRoute";
 import UserProvider, { UserContext } from "./context/userContext";
 import { Toaster } from "react-hot-toast";
@@ -35,10 +36,10 @@ const App = () => {
               <Route path="/admin/users" element={<ManageUsers />} />
             </Route>
 
-            {/* User Routes */}
-            <Route element={<PrivateRoute allowedRoles={["admin"]} />}>
+            {/* Member Routes — update progress only, no admin delete screens */}
+            <Route element={<PrivateRoute allowedRoles={["member"]} />}>
               <Route path="/user/dashboard" element={<UserDashboard />} />
-              <Route path="/user/tasks" element={<ManageTasks />} />
+              <Route path="/user/tasks" element={<MyTasks />} />
               <Route
                 path="/user/task-details/:id"
                 element={<ViewTaskDetails />}
@@ -50,7 +51,7 @@ const App = () => {
         </Router>
       </div>
       <Toaster
-        testOptions={{
+        toastOptions={{
           className: "",
           style: {
             fontSize: "13px",

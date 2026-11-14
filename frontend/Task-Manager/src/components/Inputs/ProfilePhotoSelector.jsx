@@ -36,7 +36,7 @@ const ProfilePhotoSelector = ({ image, setImage }) => {
       {/* Hidden file input */}
       <input
         type="file"
-        accept=".jpeg, .jpg, .png"
+        accept="image/jpeg,image/jpg,image/png,image/webp,.jpeg,.jpg,.png,.webp"
         ref={inputRef}
         onChange={handleImageChange}
         className="hidden"

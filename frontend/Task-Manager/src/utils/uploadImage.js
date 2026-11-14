@@ -3,20 +3,27 @@ import axiosInstance from "./axiosInstance";
 
 const uploadImage = async (imageFile) => {
   const formData = new FormData();
+  // Must match backend: upload.single("image")
   formData.append("image", imageFile);
+
   try {
     const response = await axiosInstance.post(
       API_PATHS.IMAGE.UPLOAD_IMAGE,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      formData
     );
 
-    const imageUrl = response.data?.image || response.data?.url || "";
-    return { imageUrl }; // ✅ Ensures SignUp.js works properly
+    // Backend returns: { imageUrl: "http://host/uploads/..." }
+    const imageUrl =
+      response.data?.imageUrl ||
+      response.data?.image ||
+      response.data?.url ||
+      "";
+
+    if (!imageUrl) {
+      throw new Error("Upload succeeded but no imageUrl returned");
+    }
+
+    return { imageUrl };
   } catch (error) {
     console.error("Error uploading the image:", error);
     throw error;

@@ -1,5 +1,8 @@
-export const BASE_URL = "http://localhost:8000";
-// util:/apiPaths.js
+// Vite injects VITE_* at build time. Local default keeps dev working.
+// Production (EC2): set VITE_API_URL=http://YOUR_EC2_PUBLIC_IP:8000 before `npm run build`
+export const BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 export const API_PATHS = {
   AUTH: {
     REGISTER: "/api/auth/register", // Register a new user (Admin or Member)
@@ -23,12 +26,19 @@ export const API_PATHS = {
     DELETE_TASK: (taskId) => `/api/tasks/${taskId}`, //? Delete a task (Admin only)
     UPDATE_TASK_STATUS: (taskId) => `/api/tasks/${taskId}/status`, //? Update task status
     UPDATE_TOOD_CHECKLIST: (taskId) => `/api/tasks/${taskId}/todo`, //? Update todo checklist
+    UPLOAD_ATTACHMENT: "/api/tasks/upload-attachment", // Upload file for task attachments
+    GET_ACTIVITY: (taskId) => `/api/tasks/${taskId}/activity`, // Audit trail
+  },
+  NOTIFICATIONS: {
+    GET_ALL: "/api/notifications",
+    MARK_READ: (id) => `/api/notifications/${id}/read`,
+    MARK_ALL_READ: "/api/notifications/read-all",
   },
   REPORTS: {
     EXPORT_TASKS: "/api/reports/export/tasks", //?Download all tasks as an Excel/PDF report
     EXPORT_USERS: "/api/reports/export/users", //?Download user-task report
   },
   IMAGE: {
-  UPLOAD_IMAGE: "/api/auth/upload-image",
+    UPLOAD_IMAGE: "/api/auth/upload-image",
   },
 };

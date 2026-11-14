@@ -1,4 +1,7 @@
 const Task = require("../models/Task");
+const ActivityLog = require("../models/ActivityLog");
+const Notification = require("../models/Notification");
+const { recordTaskActivity } = require("../services/activityService");
 
 // @desc    Get all tasks (Admin: all, User: only assigned tasks)
 // @route   GET /api/tasks/
@@ -110,6 +113,31 @@ const createTask = async (req, res) => {
       todoChecklist,
       attachments,
     });
+
+    await recordTaskActivity({
+      task,
+      actor: req.user,
+      action: "TASK_CREATED",
+      toStatus: task.status,
+      progress: task.progress || 0,
+      message: `${req.user.name} created task "${task.title}"`,
+      notifyAdmins: false,
+    });
+
+    // Notify assigned members about new work
+    await Promise.all(
+      (assignedTo || []).map((memberId) =>
+        Notification.create({
+          recipient: memberId,
+          sender: req.user._id,
+          task: task._id,
+          type: "TASK_CREATED",
+          title: "New task assigned",
+          message: `${req.user.name} assigned you "${task.title}"`,
+        })
+      )
+    );
+
     res.status(201).json({ message: "Task created successfull", task });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -128,7 +156,7 @@ const updateTask = async (req, res) => {
     task.priority = req.body.priority || task.priority;
     task.dueDate = req.body.dueDate || task.dueDate;
     task.todoChecklist = req.body.todoChecklist || task.todoChecklist;
-    task.attachments = req.body.atttachments || task.attachments;
+    task.attachments = req.body.attachments || task.attachments;
 
     if (req.body.assignedTo) {
       if (!Array.isArray(req.body.assignedTo)) {
@@ -172,12 +200,28 @@ const updateTaskStatus = async (req, res) => {
     if (!isAssigned && req.user.role != "admin") {
       return res.status(403).json({ message: "Not authorized" });
     }
-    task.status = req.body.status || task.status;
+
+    const fromStatus = task.status;
+    const nextStatus = req.body.status || task.status;
+    task.status = nextStatus;
     if (task.status === "Completed") {
       task.todoChecklist.forEach((item) => (item.completed = true));
       task.progress = 100;
     }
     await task.save();
+
+    if (fromStatus !== task.status) {
+      await recordTaskActivity({
+        task,
+        actor: req.user,
+        action: "STATUS_CHANGED",
+        fromStatus,
+        toStatus: task.status,
+        progress: task.progress,
+        message: `${req.user.name} changed "${task.title}" from ${fromStatus} to ${task.status}`,
+      });
+    }
+
     res.json({ message: "Task status updated", task });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -192,11 +236,15 @@ const updateTaskChecklist = async (req, res) => {
     const { todoChecklist } = req.body;
     const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ message: "Task not found" });
-    if (!task.assignedTo.includes(req.user._id) && req.user.role !== "admin") {
+    const isAssigned = task.assignedTo.some(
+      (userId) => userId.toString() === req.user._id.toString()
+    );
+    if (!isAssigned && req.user.role !== "admin") {
       return res
         .status(403)
         .json({ message: "Not authorized to update checklist" });
     }
+    const fromStatus = task.status; // capture BEFORE auto status change
     task.todoChecklist = todoChecklist; //Replace with updated checklist
     //Auto-update progress based on checklist completion
     const completedCount = task.todoChecklist.filter(
@@ -218,7 +266,52 @@ const updateTaskChecklist = async (req, res) => {
       "assignedTo",
       "name email profileImageUrl"
     );
+
+    await recordTaskActivity({
+      task: updatedTask,
+      actor: req.user,
+      action: "CHECKLIST_UPDATED",
+      fromStatus,
+      toStatus: updatedTask.status,
+      progress: updatedTask.progress,
+      message: `${req.user.name} updated checklist on "${updatedTask.title}" (${updatedTask.progress}% · ${updatedTask.status})`,
+      meta: {
+        completedCount: completedCount,
+        totalItems,
+      },
+    });
+
     res.json({ message: "Task checklist updated", task: updatedTask });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// @desc    Get audit trail for a task
+// @route   GET /api/tasks/:id/activity
+// @access  Private
+const getTaskActivity = async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id).select(
+      "assignedTo createdBy"
+    );
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    const isAssigned = task.assignedTo.some(
+      (userId) => userId.toString() === req.user._id.toString()
+    );
+    const isCreator =
+      task.createdBy && task.createdBy.toString() === req.user._id.toString();
+    if (!isAssigned && !isCreator && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const logs = await ActivityLog.find({ task: req.params.id })
+      .populate("actor", "name email role")
+      .sort({ createdAt: -1 })
+      .limit(50);
+
+    res.json({ activity: logs });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -370,6 +463,7 @@ module.exports = {
   deleteTask,
   updateTaskStatus,
   updateTaskChecklist,
+  getTaskActivity,
   getDashboardData,
   getUserDashboardData,
 };
